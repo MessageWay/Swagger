@@ -1,0 +1,346 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Send message by SMS, voicemail, messaging, and smart hybrid channels. Please register on [msgway.com](https://msgway.com) and get `apiKey`",
+    "title": "MessageWay API Documents",
+    "contact": {},
+    "version": "1.0"
+  },
+  "externalDocs": {
+    "description": "Documents",
+    "url": "https://msgway.com/doc"
+  },
+  "host": "api.msgway.com",
+  "basePath": "/",
+  "parameters": {
+    "acceptLanguage": {
+      "type": "string",
+      "enum": [
+        "fa",
+        "en"
+      ],
+      "default": "fa",
+      "name": "accept-language",
+      "in": "header",
+      "required": true
+    },
+    "apiKey": {
+      "type": "string",
+      "description": "Get `apiKey` from [msgway.com](https://msgway.com/dashboard/projects)",
+      "name": "apiKey",
+      "in": "header",
+      "required": true
+    }
+  },
+  "paths": {
+    "/send": {
+      "post": {
+        "description": "send message",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "MessageWay"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/acceptLanguage"
+          },
+          {
+            "$ref": "#/parameters/apiKey"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "description": "The number in parentheses should be sent as a `provider`, SMS providers [ 3000x(`1`), 2000(x`2`) ,9000x(`3`) ], Messenger providers [ Whatsapp(`1`), Gap(`2`) ], default provider for all methods `1`",
+            "schema": {
+              "$ref": "#/definitions/Send.Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Send.Response"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error.Response"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/status": {
+      "post": {
+        "description": "get message status",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "MessageWay"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/acceptLanguage"
+          },
+          {
+            "$ref": "#/parameters/apiKey"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Status.Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Status.Response"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error.Response"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/otp/verify": {
+      "post": {
+        "description": "verify OTP",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "MessageWay"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/acceptLanguage"
+          },
+          {
+            "$ref": "#/parameters/apiKey"
+          },
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/VerifyOTP.Request"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/VerifyOTP.Response"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error.Response"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Send.Request": {
+      "type": "object",
+      "required": [
+        "method",
+        "mobile",
+        "templateID"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "sms",
+            "ivr",
+            "messenger",
+            "smart"
+          ]
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "templateID": {
+          "description": "Get templateID from [msgway.com](https://msgway.com/dashboard/patterns)",
+          "type": "integer"
+        },
+        "provider": {
+          "type": "integer",
+          "default": 1
+        },
+        "code": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "integer"
+        },
+        "expireTime": {
+          "type": "integer"
+        },
+        "length": {
+          "type": "integer"
+        },
+        "params": {
+          "type": "array",
+          "description": "array of strings. max array size:10. length of each string, max:40",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Send.Response": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "error"
+          ]
+        },
+        "referenceID": {
+          "type": "string"
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "Status.Request": {
+      "type": "object",
+      "required": [
+        "OTPReferenceID"
+      ],
+      "properties": {
+        "OTPReferenceID": {
+          "type": "string"
+        }
+      }
+    },
+    "Status.Response": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "error"
+          ]
+        },
+        "OTPMethod": {
+          "type": "string",
+          "enum": [
+            "sms",
+            "ivr",
+            "messenger",
+            "smart"
+          ]
+        },
+        "OTPStatus": {
+          "type": "string"
+        },
+        "OTPVerified": {
+          "type": "boolean",
+          "default": false
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "VerifyOTP.Request": {
+      "type": "object",
+      "required": [
+        "mobile",
+        "otp"
+      ],
+      "properties": {
+        "mobile": {
+          "type": "string"
+        },
+        "OTP": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "integer"
+        }
+      }
+    },
+    "VerifyOTP.Response": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "success",
+            "error"
+          ]
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "Error.Response": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "default": "error"
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
